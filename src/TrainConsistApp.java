@@ -7,7 +7,17 @@ public class TrainConsistApp {
 
         List<String> trainConsist = new ArrayList<>();
 
-        System.out.println("Train consist initialized.");
-        System.out.println("Initial bogie count: " + trainConsist.size());
+        trainConsist.add("Sleeper");
+        trainConsist.add("AC Chair");
+        trainConsist.add("First Class");
+
+        System.out.println("Passenger bogies after addition: " + trainConsist);
+
+        trainConsist.remove("AC Chair");
+
+        boolean hasSleeper = trainConsist.contains("Sleeper");
+        System.out.println("Does the train have Sleeper bogie? " + hasSleeper);
+
+        System.out.println("Final train consist: " + trainConsist);
     }
 }
