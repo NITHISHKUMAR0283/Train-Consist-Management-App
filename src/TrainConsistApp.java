@@ -25,6 +25,7 @@ public class TrainConsistApp {
         System.out.println("Bogies sorted by capacity:");
         for (Bogie b : bogies) {
             System.out.println(b.name + " -> " + b.capacity + " seats");
+            
         }
-    }
+    } 
 }
