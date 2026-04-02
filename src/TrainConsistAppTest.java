@@ -4,24 +4,32 @@ import java.io.PrintStream;
 public class TrainConsistAppTest {
 
     public static void main(String[] args) {
-        testMainPrintsOnlyBogiesAboveSixtyCapacity();
-        testMainPrintsCapacityLabelInSeatsFormat();
-        System.out.println("All uc8 tests passed.");
+        testMainPrintsGroupedBogiesHeader();
+        testMainGroupsBogiesByNameAndPreservesAllCapacities();
+        System.out.println("All uc9 tests passed.");
     }
 
-    private static void testMainPrintsOnlyBogiesAboveSixtyCapacity() {
+    private static void testMainPrintsGroupedBogiesHeader() {
         String output = runMainAndCaptureOutput();
 
-        assertContains(output, "Filtered bogies (capacity > 60):", "Heading should be printed");
-        assertContains(output, "Sleeper -> 72 seats", "Sleeper bogie should be printed");
-        assertNotContains(output, "AC Chair -> 60 seats", "Bogies with capacity 60 should be excluded");
-        assertNotContains(output, "First Class -> 48 seats", "Bogies below 60 should be excluded");
+        assertContains(output, "Grouped bogies by type:", "Heading should be printed");
+        assertContains(output, "Sleeper:", "Sleeper group should be printed");
+        assertContains(output, "AC Chair:", "AC Chair group should be printed");
+        assertContains(output, "First Class:", "First Class group should be printed");
     }
 
-    private static void testMainPrintsCapacityLabelInSeatsFormat() {
+    private static void testMainGroupsBogiesByNameAndPreservesAllCapacities() {
         String output = runMainAndCaptureOutput();
 
-        assertContains(output, " -> 72 seats", "Capacity lines should use the seats suffix");
+        assertContains(output, "  72 seats", "Sleeper capacity 72 should be included");
+        assertContains(output, "  70 seats", "Second Sleeper capacity should be included");
+        assertContains(output, "  60 seats", "AC Chair capacity 60 should be included");
+        assertContains(output, "  55 seats", "Second AC Chair capacity should be included");
+        assertContains(output, "  48 seats", "First Class capacity should be included");
+
+        assertEquals(1, countOccurrences(output, "Sleeper:"), "Sleeper should appear once as a group header");
+        assertEquals(1, countOccurrences(output, "AC Chair:"), "AC Chair should appear once as a group header");
+        assertEquals(1, countOccurrences(output, "First Class:"), "First Class should appear once as a group header");
     }
 
     private static String runMainAndCaptureOutput() {
@@ -46,5 +54,21 @@ public class TrainConsistAppTest {
         if (text.contains(forbiddenFragment)) {
             throw new AssertionError(message + " Unexpected fragment: " + forbiddenFragment + "\nActual output:\n" + text);
         }
+    }
+
+    private static void assertEquals(int expected, int actual, String message) {
+        if (expected != actual) {
+            throw new AssertionError(message + " Expected: " + expected + ", Actual: " + actual);
+        }
+    }
+
+    private static int countOccurrences(String text, String fragment) {
+        int count = 0;
+        int index = 0;
+        while ((index = text.indexOf(fragment, index)) != -1) {
+            count++;
+            index += fragment.length();
+        }
+        return count;
     }
 }
