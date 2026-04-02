@@ -1,29 +1,26 @@
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
 
 public class TrainConsistAppTest {
 
     public static void main(String[] args) {
-        testMainPrintsSafetyCompliantMessage();
-        testSafetyRuleRejectsUnsafeCylindricalCargo();
-        System.out.println("All uc12 tests passed.");
+        testMainPrintsMatchingResultSizes();
+        testMainPrintsTimingMetrics();
+        System.out.println("All uc13 tests passed.");
     }
 
-    private static void testMainPrintsSafetyCompliantMessage() {
+    private static void testMainPrintsMatchingResultSizes() {
         String output = runMainAndCaptureOutput();
 
-        assertContains(output, "Train is safety compliant", "The default bogie set should be safe");
-        assertNotContains(output, "Train is NOT safety compliant", "Unsafe output should not be printed");
+        assertContains(output, "Loop result size: 100000", "The loop should keep all sleeper bogies");
+        assertContains(output, "Stream result size: 100000", "The stream should keep all sleeper bogies");
     }
 
-    private static void testSafetyRuleRejectsUnsafeCylindricalCargo() {
-        List<GoodsBogie> bogies = new ArrayList<>();
-        bogies.add(new GoodsBogie("Cylindrical", "Coal"));
-        bogies.add(new GoodsBogie("Rectangular", "Coal"));
+    private static void testMainPrintsTimingMetrics() {
+        String output = runMainAndCaptureOutput();
 
-        assertFalse(isSafetyCompliant(bogies), "A cylindrical bogie carrying coal should be unsafe");
+        assertContains(output, "Loop time (ns):", "Loop timing should be reported");
+        assertContains(output, "Stream time (ns):", "Stream timing should be reported");
     }
 
     private static String runMainAndCaptureOutput() {
@@ -38,26 +35,9 @@ public class TrainConsistAppTest {
         return outputStream.toString();
     }
 
-    private static boolean isSafetyCompliant(List<GoodsBogie> bogies) {
-        return bogies.stream()
-                .allMatch(b -> !b.type.equals("Cylindrical") || b.cargo.equals("Petroleum"));
-    }
-
     private static void assertContains(String text, String expectedFragment, String message) {
         if (!text.contains(expectedFragment)) {
             throw new AssertionError(message + " Missing fragment: " + expectedFragment + "\nActual output:\n" + text);
-        }
-    }
-
-    private static void assertNotContains(String text, String forbiddenFragment, String message) {
-        if (text.contains(forbiddenFragment)) {
-            throw new AssertionError(message + " Unexpected fragment: " + forbiddenFragment + "\nActual output:\n" + text);
-        }
-    }
-
-    private static void assertFalse(boolean condition, String message) {
-        if (condition) {
-            throw new AssertionError(message);
         }
     }
 }
