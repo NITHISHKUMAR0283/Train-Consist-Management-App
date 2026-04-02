@@ -1,47 +1,63 @@
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TrainConsistAppTest {
 
     public static void main(String[] args) {
-        testMainAcceptsValidTrainAndCargoCodes();
-        testMainRejectsInvalidTrainAndCargoCodes();
-        System.out.println("All uc11 tests passed.");
+        testMainPrintsSafetyCompliantMessage();
+        testSafetyRuleRejectsUnsafeCylindricalCargo();
+        System.out.println("All uc12 tests passed.");
     }
 
-    private static void testMainAcceptsValidTrainAndCargoCodes() {
-        String output = runMainAndCaptureOutput("TRN-1234\nPET-AB\n");
+    private static void testMainPrintsSafetyCompliantMessage() {
+        String output = runMainAndCaptureOutput();
 
-        assertContains(output, "Train ID is valid", "A valid train ID should be accepted");
-        assertContains(output, "Cargo Code is valid", "A valid cargo code should be accepted");
+        assertContains(output, "Train is safety compliant", "The default bogie set should be safe");
+        assertNotContains(output, "Train is NOT safety compliant", "Unsafe output should not be printed");
     }
 
-    private static void testMainRejectsInvalidTrainAndCargoCodes() {
-        String output = runMainAndCaptureOutput("TRAIN-12\nPET-abc\n");
+    private static void testSafetyRuleRejectsUnsafeCylindricalCargo() {
+        List<GoodsBogie> bogies = new ArrayList<>();
+        bogies.add(new GoodsBogie("Cylindrical", "Coal"));
+        bogies.add(new GoodsBogie("Rectangular", "Coal"));
 
-        assertContains(output, "Train ID is invalid", "An invalid train ID should be rejected");
-        assertContains(output, "Cargo Code is invalid", "An invalid cargo code should be rejected");
+        assertFalse(isSafetyCompliant(bogies), "A cylindrical bogie carrying coal should be unsafe");
     }
 
-    private static String runMainAndCaptureOutput(String input) {
+    private static String runMainAndCaptureOutput() {
         PrintStream originalOut = System.out;
-        java.io.InputStream originalIn = System.in;
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
             System.setOut(new PrintStream(outputStream));
-            System.setIn(new ByteArrayInputStream(input.getBytes()));
             TrainConsistApp.main(new String[0]);
         } finally {
             System.setOut(originalOut);
-            System.setIn(originalIn);
         }
         return outputStream.toString();
+    }
+
+    private static boolean isSafetyCompliant(List<GoodsBogie> bogies) {
+        return bogies.stream()
+                .allMatch(b -> !b.type.equals("Cylindrical") || b.cargo.equals("Petroleum"));
     }
 
     private static void assertContains(String text, String expectedFragment, String message) {
         if (!text.contains(expectedFragment)) {
             throw new AssertionError(message + " Missing fragment: " + expectedFragment + "\nActual output:\n" + text);
+        }
+    }
+
+    private static void assertNotContains(String text, String forbiddenFragment, String message) {
+        if (text.contains(forbiddenFragment)) {
+            throw new AssertionError(message + " Unexpected fragment: " + forbiddenFragment + "\nActual output:\n" + text);
+        }
+    }
+
+    private static void assertFalse(boolean condition, String message) {
+        if (condition) {
+            throw new AssertionError(message);
         }
     }
 }
