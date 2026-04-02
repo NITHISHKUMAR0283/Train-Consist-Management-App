@@ -1,35 +1,40 @@
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 public class TrainConsistAppTest {
 
     public static void main(String[] args) {
-        testMainPrintsTotalSeatingCapacity();
-        testMainUsesAllBogiesForTotalCapacity();
-        System.out.println("All uc10 tests passed.");
+        testMainAcceptsValidTrainAndCargoCodes();
+        testMainRejectsInvalidTrainAndCargoCodes();
+        System.out.println("All uc11 tests passed.");
     }
 
-    private static void testMainPrintsTotalSeatingCapacity() {
-        String output = runMainAndCaptureOutput();
+    private static void testMainAcceptsValidTrainAndCargoCodes() {
+        String output = runMainAndCaptureOutput("TRN-1234\nPET-AB\n");
 
-        assertContains(output, "Total seating capacity: 180", "The summed seating capacity should be printed");
+        assertContains(output, "Train ID is valid", "A valid train ID should be accepted");
+        assertContains(output, "Cargo Code is valid", "A valid cargo code should be accepted");
     }
 
-    private static void testMainUsesAllBogiesForTotalCapacity() {
-        String output = runMainAndCaptureOutput();
+    private static void testMainRejectsInvalidTrainAndCargoCodes() {
+        String output = runMainAndCaptureOutput("TRAIN-12\nPET-abc\n");
 
-        assertContains(output, "Total seating capacity: 180", "The total should include all three bogies");
->>>>>>> feature/uc10
+        assertContains(output, "Train ID is invalid", "An invalid train ID should be rejected");
+        assertContains(output, "Cargo Code is invalid", "An invalid cargo code should be rejected");
     }
 
-    private static String runMainAndCaptureOutput() {
+    private static String runMainAndCaptureOutput(String input) {
         PrintStream originalOut = System.out;
+        java.io.InputStream originalIn = System.in;
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
             System.setOut(new PrintStream(outputStream));
+            System.setIn(new ByteArrayInputStream(input.getBytes()));
             TrainConsistApp.main(new String[0]);
         } finally {
             System.setOut(originalOut);
+            System.setIn(originalIn);
         }
         return outputStream.toString();
     }
