@@ -4,23 +4,21 @@ import java.io.PrintStream;
 public class TrainConsistAppTest {
 
     public static void main(String[] args) {
-        testMainPrintsMatchingResultSizes();
-        testMainPrintsTimingMetrics();
-        System.out.println("All uc13 tests passed.");
+        testMainPrintsCapacityExceptionMessage();
+        testBogieConstructorRejectsNonPositiveCapacity();
+        System.out.println("All uc14 tests passed.");
     }
 
-    private static void testMainPrintsMatchingResultSizes() {
+    private static void testMainPrintsCapacityExceptionMessage() {
         String output = runMainAndCaptureOutput();
 
-        assertContains(output, "Loop result size: 100000", "The loop should keep all sleeper bogies");
-        assertContains(output, "Stream result size: 100000", "The stream should keep all sleeper bogies");
+        assertContains(output, "Capacity must be greater than zero", "The exception message should be printed");
+        assertNotContains(output, "First Class -> -10", "Invalid bogie output should not be printed after the exception");
     }
 
-    private static void testMainPrintsTimingMetrics() {
-        String output = runMainAndCaptureOutput();
-
-        assertContains(output, "Loop time (ns):", "Loop timing should be reported");
-        assertContains(output, "Stream time (ns):", "Stream timing should be reported");
+    private static void testBogieConstructorRejectsNonPositiveCapacity() {
+        assertThrowsInvalidCapacity(() -> new Bogie("Coach", 0));
+        assertThrowsInvalidCapacity(() -> new Bogie("Coach", -5));
     }
 
     private static String runMainAndCaptureOutput() {
@@ -35,9 +33,28 @@ public class TrainConsistAppTest {
         return outputStream.toString();
     }
 
+    private static void assertThrowsInvalidCapacity(BogieSupplier supplier) {
+        try {
+            supplier.create();
+            throw new AssertionError("Expected InvalidCapacityException to be thrown");
+        } catch (InvalidCapacityException e) {
+            assertContains(e.getMessage(), "Capacity must be greater than zero", "Exception message should be preserved");
+        }
+    }
+
     private static void assertContains(String text, String expectedFragment, String message) {
         if (!text.contains(expectedFragment)) {
             throw new AssertionError(message + " Missing fragment: " + expectedFragment + "\nActual output:\n" + text);
         }
+    }
+
+    private static void assertNotContains(String text, String forbiddenFragment, String message) {
+        if (text.contains(forbiddenFragment)) {
+            throw new AssertionError(message + " Unexpected fragment: " + forbiddenFragment + "\nActual output:\n" + text);
+        }
+    }
+
+    private interface BogieSupplier {
+        Bogie create() throws InvalidCapacityException;
     }
 }
