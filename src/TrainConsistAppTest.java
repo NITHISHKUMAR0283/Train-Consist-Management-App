@@ -75,6 +75,7 @@ public class TrainConsistAppTest {
         }
         return out.toString();
     }
+    
 
     private static void assertContains(String text, String expected, String msg) {
         if (!text.contains(expected)) {
