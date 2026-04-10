@@ -52,34 +52,13 @@ class GoodsBogie extends Bogie {
 
 public class TrainConsistApp {
 
-    static void bubbleSort(int[] arr) {
-        int n = arr.length;
-        for (int i = 0; i < n - 1; i++) {
-            for (int j = 0; j < n - i - 1; j++) {
-                if (arr[j] > arr[j + 1]) {
-                    int temp = arr[j];
-                    arr[j] = arr[j + 1];
-                    arr[j + 1] = temp;
-                }
-            }
-        }
-    }
-
-    static void sortBogieNames(String[] arr) {
-        Arrays.sort(arr);
-    }
-
-    static boolean linearSearch(String[] arr, String key) {
-        for (String id : arr) {
-            if (id.equals(key)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     static boolean binarySearch(String[] arr, String key) {
+        if (arr.length == 0) {
+            throw new IllegalStateException("No bogies available for search");
+        }
+
         Arrays.sort(arr);
+
         int low = 0;
         int high = arr.length - 1;
 
@@ -115,19 +94,15 @@ public class TrainConsistApp {
             g2.assignCargo("Petroleum");
             g2.assignCargo("Grain");
 
-            int[] capacities = {72, 56, 24, 70, 60};
-            bubbleSort(capacities);
-
-            String[] bogieNames = {"Sleeper","AC Chair","First Class","General","Luxury"};
-            sortBogieNames(bogieNames);
-
             String[] bogieIds = {"BG101","BG205","BG309","BG412","BG550"};
             String searchKey = "BG309";
 
             boolean result = binarySearch(bogieIds, searchKey);
-            System.out.println("Binary Search Result for " + searchKey + ": " + result);
+            System.out.println("Search Result: " + result);
 
         } catch (InvalidCapacityException e) {
+            System.out.println(e.getMessage());
+        } catch (IllegalStateException e) {
             System.out.println(e.getMessage());
         }
     }

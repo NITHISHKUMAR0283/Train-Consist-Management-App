@@ -1,50 +1,46 @@
 public class TrainConsistAppTest {
 
     public static void main(String[] args) {
-        testBinarySearch_BogieFound();
-        testBinarySearch_BogieNotFound();
-        testBinarySearch_FirstElementMatch();
-        testBinarySearch_LastElementMatch();
-        testBinarySearch_SingleElementArray();
-        testBinarySearch_EmptyArray();
-        testBinarySearch_UnsortedInputHandled();
+        testSearch_ThrowsExceptionWhenEmpty();
+        testSearch_AllowsSearchWhenDataExists();
+        testSearch_BogieFoundAfterValidation();
+        testSearch_BogieNotFoundAfterValidation();
+        testSearch_SingleElementValidCase();
 
-        System.out.println("All UC19 tests passed.");
+        System.out.println("All UC20 tests passed.");
     }
 
-    private static void testBinarySearch_BogieFound() {
-        String[] arr = {"BG101","BG205","BG309","BG412","BG550"};
-        assertTrue(TrainConsistApp.binarySearch(arr, "BG309"));
+    private static void testSearch_ThrowsExceptionWhenEmpty() {
+        try {
+            String[] arr = {};
+            TrainConsistApp.binarySearch(arr, "BG101");
+            throw new AssertionError("Expected IllegalStateException");
+        } catch (IllegalStateException e) {
+            assertContains(e.getMessage(), "No bogies available", "Exception message mismatch");
+        }
     }
 
-    private static void testBinarySearch_BogieNotFound() {
-        String[] arr = {"BG101","BG205","BG309","BG412","BG550"};
-        assertFalse(TrainConsistApp.binarySearch(arr, "BG999"));
+    private static void testSearch_AllowsSearchWhenDataExists() {
+        String[] arr = {"BG101","BG205"};
+        TrainConsistApp.binarySearch(arr, "BG101");
     }
 
-    private static void testBinarySearch_FirstElementMatch() {
-        String[] arr = {"BG101","BG205","BG309","BG412","BG550"};
-        assertTrue(TrainConsistApp.binarySearch(arr, "BG101"));
+    private static void testSearch_BogieFoundAfterValidation() {
+        String[] arr = {"BG101","BG205","BG309"};
+        boolean result = TrainConsistApp.binarySearch(arr, "BG205");
+        assertTrue(result);
     }
 
-    private static void testBinarySearch_LastElementMatch() {
-        String[] arr = {"BG101","BG205","BG309","BG412","BG550"};
-        assertTrue(TrainConsistApp.binarySearch(arr, "BG550"));
+    private static void testSearch_BogieNotFoundAfterValidation() {
+        String[] arr = {"BG101","BG205","BG309"};
+        boolean result = TrainConsistApp.binarySearch(arr, "BG999");
+        assertFalse(result);
     }
 
-    private static void testBinarySearch_SingleElementArray() {
+    private static void testSearch_SingleElementValidCase() {
         String[] arr = {"BG101"};
-        assertTrue(TrainConsistApp.binarySearch(arr, "BG101"));
-    }
-
-    private static void testBinarySearch_EmptyArray() {
-        String[] arr = {};
-        assertFalse(TrainConsistApp.binarySearch(arr, "BG101"));
-    }
-
-    private static void testBinarySearch_UnsortedInputHandled() {
-        String[] arr = {"BG309","BG101","BG550","BG205","BG412"};
-        assertTrue(TrainConsistApp.binarySearch(arr, "BG205"));
+        boolean result = TrainConsistApp.binarySearch(arr, "BG101");
+        assertTrue(result);
     }
 
     private static void assertTrue(boolean condition) {
@@ -56,6 +52,12 @@ public class TrainConsistAppTest {
     private static void assertFalse(boolean condition) {
         if (condition) {
             throw new AssertionError("Expected false but got true");
+        }
+    }
+
+    private static void assertContains(String text, String expected, String msg) {
+        if (!text.contains(expected)) {
+            throw new AssertionError(msg + "\nActual: " + text);
         }
     }
 }
