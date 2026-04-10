@@ -69,6 +69,15 @@ public class TrainConsistApp {
         Arrays.sort(arr);
     }
 
+    static boolean linearSearch(String[] arr, String key) {
+        for (String id : arr) {
+            if (id.equals(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void main(String[] args) {
         System.out.println("=== Train Consist Management App ===");
 
@@ -89,17 +98,14 @@ public class TrainConsistApp {
             int[] capacities = {72, 56, 24, 70, 60};
             bubbleSort(capacities);
 
-            System.out.println("Sorted Capacities:");
-            for (int c : capacities) {
-                System.out.print(c + " ");
-            }
-            System.out.println();
-
             String[] bogieNames = {"Sleeper","AC Chair","First Class","General","Luxury"};
             sortBogieNames(bogieNames);
 
-            System.out.println("Sorted Bogie Names:");
-            System.out.println(Arrays.toString(bogieNames));
+            String[] bogieIds = {"BG101","BG205","BG309","BG412","BG550"};
+            String searchKey = "BG309";
+
+            boolean found = linearSearch(bogieIds, searchKey);
+            System.out.println("Search Result for " + searchKey + ": " + found);
 
         } catch (InvalidCapacityException e) {
             System.out.println(e.getMessage());
