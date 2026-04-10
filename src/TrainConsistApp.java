@@ -6,6 +6,12 @@ class InvalidCapacityException extends Exception {
     }
 }
 
+class CargoSafetyException extends RuntimeException {
+    CargoSafetyException(String message) {
+        super(message);
+    }
+}
+
 class Bogie {
     String name;
     int capacity;
@@ -19,6 +25,31 @@ class Bogie {
     }
 }
 
+class GoodsBogie extends Bogie {
+    String shape;
+    String cargo;
+
+    GoodsBogie(String name, int capacity, String shape) throws InvalidCapacityException {
+        super(name, capacity);
+        this.shape = shape;
+    }
+
+    void assignCargo(String cargoType) {
+        try {
+            if (shape.equalsIgnoreCase("Rectangular") &&
+                cargoType.equalsIgnoreCase("Petroleum")) {
+                throw new CargoSafetyException("Unsafe cargo! Petroleum cannot be stored in Rectangular bogie");
+            }
+            this.cargo = cargoType;
+            System.out.println("Cargo assigned successfully: " + cargoType);
+        } catch (CargoSafetyException e) {
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            System.out.println("Cargo assignment attempt completed for " + name);
+        }
+    }
+}
+
 public class TrainConsistApp {
     public static void main(String[] args) {
         System.out.println("=== Train Consist Management App ===");
@@ -26,11 +57,17 @@ public class TrainConsistApp {
         try {
             Bogie b1 = new Bogie("Sleeper", 72);
             Bogie b2 = new Bogie("AC Chair", 60);
-            Bogie b3 = new Bogie("First Class", -10);
 
             System.out.println(b1.name + " -> " + b1.capacity);
             System.out.println(b2.name + " -> " + b2.capacity);
-            System.out.println(b3.name + " -> " + b3.capacity);
+
+            GoodsBogie g1 = new GoodsBogie("Goods-1", 100, "Cylindrical");
+            GoodsBogie g2 = new GoodsBogie("Goods-2", 120, "Rectangular");
+
+            g1.assignCargo("Petroleum");
+            g2.assignCargo("Petroleum");
+            g2.assignCargo("Grain");
+
         } catch (InvalidCapacityException e) {
             System.out.println(e.getMessage());
         }

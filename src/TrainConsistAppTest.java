@@ -3,58 +3,82 @@ import java.io.PrintStream;
 
 public class TrainConsistAppTest {
 
-    public static void main(String[] args) {
-        testMainPrintsCapacityExceptionMessage();
-        testBogieConstructorRejectsNonPositiveCapacity();
-        System.out.println("All uc14 tests passed.");
+    public static void main(String[] args) throws Exception {
+        testCargo_SafeAssignment();
+        testCargo_UnsafeAssignmentHandled();
+        testCargo_CargoNotAssignedAfterFailure();
+        testCargo_ProgramContinuesAfterException();
+        testCargo_FinallyBlockExecution();
+
+        System.out.println("All UC15 tests passed.");
     }
 
-    private static void testMainPrintsCapacityExceptionMessage() {
-        String output = runMainAndCaptureOutput();
+    private static void testCargo_SafeAssignment() throws Exception {
+        GoodsBogie g = new GoodsBogie("G1", 100, "Cylindrical");
+        g.assignCargo("Petroleum");
 
-        assertContains(output, "Capacity must be greater than zero", "The exception message should be printed");
-        assertNotContains(output, "First Class -> -10", "Invalid bogie output should not be printed after the exception");
+        if (!"Petroleum".equals(g.cargo)) {
+            throw new AssertionError("Safe cargo should be assigned");
+        }
     }
 
-    private static void testBogieConstructorRejectsNonPositiveCapacity() {
-        assertThrowsInvalidCapacity(() -> new Bogie("Coach", 0));
-        assertThrowsInvalidCapacity(() -> new Bogie("Coach", -5));
+    private static void testCargo_UnsafeAssignmentHandled() throws Exception {
+        String output = capture(() -> {
+            try {
+                GoodsBogie g = new GoodsBogie("G2", 100, "Rectangular");
+                g.assignCargo("Petroleum");
+            } catch (Exception e) {}
+        });
+
+        assertContains(output, "Unsafe cargo", "Exception should be handled");
     }
 
-    private static String runMainAndCaptureOutput() {
-        PrintStream originalOut = System.out;
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    private static void testCargo_CargoNotAssignedAfterFailure() throws Exception {
+        GoodsBogie g = new GoodsBogie("G3", 100, "Rectangular");
+        g.assignCargo("Petroleum");
+
+        if (g.cargo != null) {
+            throw new AssertionError("Cargo should not be assigned on failure");
+        }
+    }
+
+    private static void testCargo_ProgramContinuesAfterException() throws Exception {
+        GoodsBogie g = new GoodsBogie("G4", 100, "Rectangular");
+
+        g.assignCargo("Petroleum");
+        g.assignCargo("Grain");
+
+        if (!"Grain".equals(g.cargo)) {
+            throw new AssertionError("Program should continue after exception");
+        }
+    }
+
+    private static void testCargo_FinallyBlockExecution() throws Exception {
+        String output = capture(() -> {
+            try {
+                GoodsBogie g = new GoodsBogie("G5", 100, "Rectangular");
+                g.assignCargo("Petroleum");
+            } catch (Exception e) {}
+        });
+
+        assertContains(output, "Cargo assignment attempt completed", "Finally block must execute");
+    }
+
+    private static String capture(Runnable r) {
+        PrintStream original = System.out;
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
         try {
-            System.setOut(new PrintStream(outputStream));
-            TrainConsistApp.main(new String[0]);
+            r.run();
         } finally {
-            System.setOut(originalOut);
+            System.setOut(original);
         }
-        return outputStream.toString();
+        return out.toString();
     }
 
-    private static void assertThrowsInvalidCapacity(BogieSupplier supplier) {
-        try {
-            supplier.create();
-            throw new AssertionError("Expected InvalidCapacityException to be thrown");
-        } catch (InvalidCapacityException e) {
-            assertContains(e.getMessage(), "Capacity must be greater than zero", "Exception message should be preserved");
+    private static void assertContains(String text, String expected, String msg) {
+        if (!text.contains(expected)) {
+            throw new AssertionError(msg + "\nOutput:\n" + text);
         }
-    }
-
-    private static void assertContains(String text, String expectedFragment, String message) {
-        if (!text.contains(expectedFragment)) {
-            throw new AssertionError(message + " Missing fragment: " + expectedFragment + "\nActual output:\n" + text);
-        }
-    }
-
-    private static void assertNotContains(String text, String forbiddenFragment, String message) {
-        if (text.contains(forbiddenFragment)) {
-            throw new AssertionError(message + " Unexpected fragment: " + forbiddenFragment + "\nActual output:\n" + text);
-        }
-    }
-
-    private interface BogieSupplier {
-        Bogie create() throws InvalidCapacityException;
     }
 }
