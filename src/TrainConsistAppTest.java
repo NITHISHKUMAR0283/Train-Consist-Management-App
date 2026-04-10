@@ -1,43 +1,50 @@
 public class TrainConsistAppTest {
 
     public static void main(String[] args) {
-        testSearch_BogieFound();
-        testSearch_BogieNotFound();
-        testSearch_FirstElementMatch();
-        testSearch_LastElementMatch();
-        testSearch_SingleElementArray();
+        testBinarySearch_BogieFound();
+        testBinarySearch_BogieNotFound();
+        testBinarySearch_FirstElementMatch();
+        testBinarySearch_LastElementMatch();
+        testBinarySearch_SingleElementArray();
+        testBinarySearch_EmptyArray();
+        testBinarySearch_UnsortedInputHandled();
 
-        System.out.println("All UC18 tests passed.");
+        System.out.println("All UC19 tests passed.");
     }
 
-    private static void testSearch_BogieFound() {
+    private static void testBinarySearch_BogieFound() {
         String[] arr = {"BG101","BG205","BG309","BG412","BG550"};
-        boolean result = TrainConsistApp.linearSearch(arr, "BG309");
-        assertTrue(result);
+        assertTrue(TrainConsistApp.binarySearch(arr, "BG309"));
     }
 
-    private static void testSearch_BogieNotFound() {
+    private static void testBinarySearch_BogieNotFound() {
         String[] arr = {"BG101","BG205","BG309","BG412","BG550"};
-        boolean result = TrainConsistApp.linearSearch(arr, "BG999");
-        assertFalse(result);
+        assertFalse(TrainConsistApp.binarySearch(arr, "BG999"));
     }
 
-    private static void testSearch_FirstElementMatch() {
+    private static void testBinarySearch_FirstElementMatch() {
         String[] arr = {"BG101","BG205","BG309","BG412","BG550"};
-        boolean result = TrainConsistApp.linearSearch(arr, "BG101");
-        assertTrue(result);
+        assertTrue(TrainConsistApp.binarySearch(arr, "BG101"));
     }
 
-    private static void testSearch_LastElementMatch() {
+    private static void testBinarySearch_LastElementMatch() {
         String[] arr = {"BG101","BG205","BG309","BG412","BG550"};
-        boolean result = TrainConsistApp.linearSearch(arr, "BG550");
-        assertTrue(result);
+        assertTrue(TrainConsistApp.binarySearch(arr, "BG550"));
     }
 
-    private static void testSearch_SingleElementArray() {
+    private static void testBinarySearch_SingleElementArray() {
         String[] arr = {"BG101"};
-        boolean result = TrainConsistApp.linearSearch(arr, "BG101");
-        assertTrue(result);
+        assertTrue(TrainConsistApp.binarySearch(arr, "BG101"));
+    }
+
+    private static void testBinarySearch_EmptyArray() {
+        String[] arr = {};
+        assertFalse(TrainConsistApp.binarySearch(arr, "BG101"));
+    }
+
+    private static void testBinarySearch_UnsortedInputHandled() {
+        String[] arr = {"BG309","BG101","BG550","BG205","BG412"};
+        assertTrue(TrainConsistApp.binarySearch(arr, "BG205"));
     }
 
     private static void assertTrue(boolean condition) {

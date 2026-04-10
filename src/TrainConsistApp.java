@@ -78,6 +78,26 @@ public class TrainConsistApp {
         return false;
     }
 
+    static boolean binarySearch(String[] arr, String key) {
+        Arrays.sort(arr);
+        int low = 0;
+        int high = arr.length - 1;
+
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            int cmp = arr[mid].compareTo(key);
+
+            if (cmp == 0) {
+                return true;
+            } else if (cmp < 0) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return false;
+    }
+
     public static void main(String[] args) {
         System.out.println("=== Train Consist Management App ===");
 
@@ -104,8 +124,8 @@ public class TrainConsistApp {
             String[] bogieIds = {"BG101","BG205","BG309","BG412","BG550"};
             String searchKey = "BG309";
 
-            boolean found = linearSearch(bogieIds, searchKey);
-            System.out.println("Search Result for " + searchKey + ": " + found);
+            boolean result = binarySearch(bogieIds, searchKey);
+            System.out.println("Binary Search Result for " + searchKey + ": " + result);
 
         } catch (InvalidCapacityException e) {
             System.out.println(e.getMessage());
