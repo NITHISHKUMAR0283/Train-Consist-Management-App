@@ -51,6 +51,20 @@ class GoodsBogie extends Bogie {
 }
 
 public class TrainConsistApp {
+
+    static void bubbleSort(int[] arr) {
+        int n = arr.length;
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (arr[j] > arr[j + 1]) {
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                }
+            }
+        }
+    }
+
     public static void main(String[] args) {
         System.out.println("=== Train Consist Management App ===");
 
@@ -67,6 +81,15 @@ public class TrainConsistApp {
             g1.assignCargo("Petroleum");
             g2.assignCargo("Petroleum");
             g2.assignCargo("Grain");
+
+            int[] capacities = {72, 56, 24, 70, 60};
+
+            bubbleSort(capacities);
+
+            System.out.println("Sorted Capacities:");
+            for (int c : capacities) {
+                System.out.print(c + " ");
+            }
 
         } catch (InvalidCapacityException e) {
             System.out.println(e.getMessage());

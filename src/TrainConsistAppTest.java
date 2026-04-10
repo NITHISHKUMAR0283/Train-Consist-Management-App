@@ -1,85 +1,51 @@
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.util.Arrays;
 
 public class TrainConsistAppTest {
 
-    public static void main(String[] args) throws Exception {
-        testCargo_SafeAssignment();
-        testCargo_UnsafeAssignmentHandled();
-        testCargo_CargoNotAssignedAfterFailure();
-        testCargo_ProgramContinuesAfterException();
-        testCargo_FinallyBlockExecution();
+    public static void main(String[] args) {
+        testSort_BasicSorting();
+        testSort_AlreadySortedArray();
+        testSort_DuplicateValues();
+        testSort_SingleElementArray();
+        testSort_AllEqualValues();
 
-        System.out.println("All UC15 tests passed.");
+        System.out.println("All UC16 tests passed.");
     }
 
-    private static void testCargo_SafeAssignment() throws Exception {
-        GoodsBogie g = new GoodsBogie("G1", 100, "Cylindrical");
-        g.assignCargo("Petroleum");
-
-        if (!"Petroleum".equals(g.cargo)) {
-            throw new AssertionError("Safe cargo should be assigned");
-        }
+    private static void testSort_BasicSorting() {
+        int[] arr = {72, 56, 24, 70, 60};
+        TrainConsistApp.bubbleSort(arr);
+        assertArrayEquals(arr, new int[]{24, 56, 60, 70, 72});
     }
 
-    private static void testCargo_UnsafeAssignmentHandled() throws Exception {
-        String output = capture(() -> {
-            try {
-                GoodsBogie g = new GoodsBogie("G2", 100, "Rectangular");
-                g.assignCargo("Petroleum");
-            } catch (Exception e) {}
-        });
-
-        assertContains(output, "Unsafe cargo", "Exception should be handled");
+    private static void testSort_AlreadySortedArray() {
+        int[] arr = {24, 56, 60, 70, 72};
+        TrainConsistApp.bubbleSort(arr);
+        assertArrayEquals(arr, new int[]{24, 56, 60, 70, 72});
     }
 
-    private static void testCargo_CargoNotAssignedAfterFailure() throws Exception {
-        GoodsBogie g = new GoodsBogie("G3", 100, "Rectangular");
-        g.assignCargo("Petroleum");
-
-        if (g.cargo != null) {
-            throw new AssertionError("Cargo should not be assigned on failure");
-        }
+    private static void testSort_DuplicateValues() {
+        int[] arr = {72, 56, 56, 24};
+        TrainConsistApp.bubbleSort(arr);
+        assertArrayEquals(arr, new int[]{24, 56, 56, 72});
     }
 
-    private static void testCargo_ProgramContinuesAfterException() throws Exception {
-        GoodsBogie g = new GoodsBogie("G4", 100, "Rectangular");
-
-        g.assignCargo("Petroleum");
-        g.assignCargo("Grain");
-
-        if (!"Grain".equals(g.cargo)) {
-            throw new AssertionError("Program should continue after exception");
-        }
+    private static void testSort_SingleElementArray() {
+        int[] arr = {50};
+        TrainConsistApp.bubbleSort(arr);
+        assertArrayEquals(arr, new int[]{50});
     }
 
-    private static void testCargo_FinallyBlockExecution() throws Exception {
-        String output = capture(() -> {
-            try {
-                GoodsBogie g = new GoodsBogie("G5", 100, "Rectangular");
-                g.assignCargo("Petroleum");
-            } catch (Exception e) {}
-        });
-
-        assertContains(output, "Cargo assignment attempt completed", "Finally block must execute");
+    private static void testSort_AllEqualValues() {
+        int[] arr = {40, 40, 40};
+        TrainConsistApp.bubbleSort(arr);
+        assertArrayEquals(arr, new int[]{40, 40, 40});
     }
 
-    private static String capture(Runnable r) {
-        PrintStream original = System.out;
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(out));
-        try {
-            r.run();
-        } finally {
-            System.setOut(original);
-        }
-        return out.toString();
-    }
-    
-
-    private static void assertContains(String text, String expected, String msg) {
-        if (!text.contains(expected)) {
-            throw new AssertionError(msg + "\nOutput:\n" + text);
+    private static void assertArrayEquals(int[] actual, int[] expected) {
+        if (!Arrays.equals(actual, expected)) {
+            throw new AssertionError("Expected: " + Arrays.toString(expected) +
+                                     " but got: " + Arrays.toString(actual));
         }
     }
 }
