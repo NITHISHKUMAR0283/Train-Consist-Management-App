@@ -65,6 +65,10 @@ public class TrainConsistApp {
         }
     }
 
+    static void sortBogieNames(String[] arr) {
+        Arrays.sort(arr);
+    }
+
     public static void main(String[] args) {
         System.out.println("=== Train Consist Management App ===");
 
@@ -83,13 +87,19 @@ public class TrainConsistApp {
             g2.assignCargo("Grain");
 
             int[] capacities = {72, 56, 24, 70, 60};
-
             bubbleSort(capacities);
 
             System.out.println("Sorted Capacities:");
             for (int c : capacities) {
                 System.out.print(c + " ");
             }
+            System.out.println();
+
+            String[] bogieNames = {"Sleeper","AC Chair","First Class","General","Luxury"};
+            sortBogieNames(bogieNames);
+
+            System.out.println("Sorted Bogie Names:");
+            System.out.println(Arrays.toString(bogieNames));
 
         } catch (InvalidCapacityException e) {
             System.out.println(e.getMessage());
